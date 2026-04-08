@@ -17,9 +17,11 @@ import { DateTime } from "luxon";
 import { useState } from "react";
 import { createSearchParams, useNavigate } from "react-router-dom";
 
+import type { GridColDef } from "@mui/x-data-grid";
 import { useOnEnter } from "../../../../shared/hooks/useOnEnter";
+import CcsTable, { DEFAULT_HEADER_DEF } from "../../../../shared/ui/CcsTable";
 import CopyButton from "../../../../shared/ui/CopyButton";
-import { dateStringFromDate } from "../../../../shared/utils/formatting/Formatting";
+import { dateStringFromDate, formatNumber } from "../../../../shared/utils/formatting/Formatting";
 import type { AIModel } from "../../api/models/types";
 
 type CATALOG = "CIRRASCALE" | "OTHER";
@@ -47,6 +49,30 @@ const ModelCatalog = () => {
       });
     }
   };
+
+  const COLUMN_DEF: GridColDef[] = [
+    {
+      ...DEFAULT_HEADER_DEF,
+      headerName: "Name",
+      field: "modelName"
+    },
+    {
+      ...DEFAULT_HEADER_DEF,
+      headerName: "Hugging Face Model Name",
+      field: "huggingFaceModelName"
+    },
+    {
+      ...DEFAULT_HEADER_DEF,
+      headerName: "Updated Date",
+      field: "dateUpdated"
+    },
+    {
+      ...DEFAULT_HEADER_DEF,
+      headerName: "Version",
+      field: "version",
+      renderCell: (params) => formatNumber(params.value)
+    }
+  ];
 
   const modelCatalog = [
     {
@@ -218,6 +244,18 @@ const ModelCatalog = () => {
             </Grid>
           ))}
       </Grid>
+      <Card>
+        <CardHeader title={"Model Catalog"} />
+        <CardContent>
+          <CcsTable
+            data-testid="view-pipelines-table"
+            rows={modelCatalog || []}
+            columns={COLUMN_DEF}
+            getRowId={(row) => row.modelName}
+            disableRowSelectionOnClick={false}
+          />
+        </CardContent>
+      </Card>
     </Box>
   );
 };
